@@ -1,12 +1,16 @@
 import discord
+
 from discord.ext import commands
 from discord import FFmpegPCMAudio
 from discord import member
+import yt_dlp
 from discord.ext.commands import has_permissions, MissingPermissions
 import requests
 import asyncio
 import json
-import youtube_dl
+
+import yt_dlp as youtube_dl
+
 
 intents = discord.Intents.default()
 intents.members = True 
@@ -29,6 +33,9 @@ async def on_message(message):
     if message.content == "hi":
         await message.delete()
         await message.channel.send("Don't send that again.")
+        await message.channel.send("https://tenor.com/view/yamcha-yamcha-death-pose-yamcha-dead-yamcha-on-the-ground-yamcha-sleeping-gif-15816799")
+       
+
     else:
         # Process commands manually if the message doesn't start with the prefix
         await client.process_commands(message)
@@ -38,6 +45,10 @@ async def on_message(message):
 
 @client.event
 async def on_ready():
+    #await client.change_presence(status=discord.Status.idle, activity=discord.Game('Injustice Gods Among Us'))
+    #await client.change_presence(status=discord.Status.idle, activity=discord.Activity(type=discord.ActivityType.listening,name='my youtube video'))
+    await client.change_presence(status=discord.Status.idle, activity=discord.Streaming(name='Injustice Gods Among Us',url='https://www.twitch.tv/directory/category/injustice-gods-among-us'))
+    
     print("the bot is ready")
     print("--------------------")
 
@@ -328,33 +339,56 @@ async def queue(ctx,arg):
     await ctx.send("added to queue")
 
 
+
+
+
 async def play_youtube(ctx, url):
-    voice_channel = ctx.author.voice.channel
-    if voice_channel:
-        # Join the voice channel
-        voice = await voice_channel.connect()
-        # Download audio from the YouTube link
-        ydl_opts = {
-            'format': 'bestaudio/best',
-            'postprocessors': [{
-                'key': 'FFmpegExtractAudio',
-                'preferredcodec': 'mp3',
-                'preferredquality': '192',
-            }],
-            'verbose': True  # Add this line for detailed output
-        }
-        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-            try:
+    try:
+        # Check if the user is in a voice channel
+        if ctx.author.voice and ctx.author.voice.channel:
+            # Join the voice channel
+            voice_channel = ctx.author.voice.channel
+            voice = await voice_channel.connect()
+            print("Connected to voice channel.")
+            
+            # Download audio from the YouTube link
+            ydl_opts = {
+                'format': 'bestaudio/best',
+                'postprocessors': [{
+                    'key': 'FFmpegExtractAudio',
+                    'preferredcodec': 'mp3',
+                    'preferredquality': '192',
+                }],
+                'outtmpl': 'downloaded_audio.%(ext)s',
+                'quiet': True,
+            }
+            
+            # Download the audio file
+            print("Downloading audio...")
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 info = ydl.extract_info(url, download=True)
                 filename = ydl.prepare_filename(info)
-            except youtube_dl.utils.DownloadError as e:
-                await ctx.send(f"Error: {e}")
-                return
-        # Play the downloaded audio
-        source = discord.FFmpegPCMAudio(filename)
-        voice.play(source)
-    else:
-        await ctx.send("You are not in a voice channel.")
+            
+            # Play the audio file
+            print(f"Playing audio from file: {filename}")
+            source = discord.FFmpegPCMAudio(filename)
+            voice.play(source)
+
+            # Wait for the audio to finish playing
+            while voice.is_playing():
+                await asyncio.sleep(1)
+            
+            # Disconnect from the voice channel after playing
+            await voice.disconnect()
+            print("Disconnected from voice channel.")
+            
+        else:
+            await ctx.send("You must be in a voice channel to use this command.")
+    
+    except Exception as e:
+        await ctx.send(f"Error: {e}")
+        print(f"Error occurred: {e}")
+
 
 
 @client.command(pass_content= True)
@@ -399,4 +433,15 @@ async def embed(ctx):
     embed.set_footer(text="Bye bye")
     await ctx.send(embed=embed)
 #client.run('Your key')
+
+
+@client.command()
+async def message(ctx,user:discord.Member,*,message=None):
+    message= "welcome to the server"
+    embed=discord.Embed(title=message)
+    await user.send(embed=embed)
+
+
+
+
 
