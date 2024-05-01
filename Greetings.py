@@ -96,6 +96,28 @@ class Greetings(commands.Cog):
         channel = self.client.get_channel(1223345494353248320)  # Use self.client
         await channel.send(f"Goodbye {member.name}!")
         print("--------------------")
+    @commands.Cog.listener()
+    async def on_reaction_add(self, reaction,user):
+        channel=reaction.message.channel
+        await channel.send(user.name+" added: "+reaction.emoji)
+
+    @commands.Cog.listener()
+    async def on_reaction_remove(self, reaction,user):
+        channel=reaction.message.channel
+        await channel.send(user.name+" removed: "+reaction.emoji)
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.author==self.client.user:
+            return
+        if ("happy") in message.content:
+            #emoji="👌 "
+            emoji = "\U0001F44C"
+            
+            await message.add_reaction(emoji)
+
+        
+
 
 def setup(client):
     client.add_cog(Greetings(client))

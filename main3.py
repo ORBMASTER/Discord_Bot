@@ -1,4 +1,5 @@
 import nextcord
+from nextcord import Interaction
 from nextcord.ext import commands
 from apikeys import *
 import os
@@ -16,7 +17,9 @@ for filename in os.listdir(cogs_folder):
 # Add other initialization code as needed
 
 # Run the bot with your token
-
-
+testServerId=1223345494353248317
+@client.slash_command(name="test",description="introduction to slash commands",guild_ids=[testServerId])
+async def test(interaction:Interaction):
+    await interaction.response.send_message("hello surbscribe bitch")
 
 client.run(DISCORD_BOT_TOKEN)
