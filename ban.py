@@ -1,9 +1,18 @@
-
+import nextcord
 from nextcord.ext import commands
+from nextcord import Interaction
 
 class Ban(commands.Cog):
     def __init__(self, client):
         self.client = client
+    testServerId=1223345494353248317
+        
+
+
+    @nextcord.slash_command(name="testban",description="ban message",guild_ids=[testServerId])
+    async def testban(self,interaction:Interaction):
+        await interaction.response.send_message("banned?")
+
         
     
     @commands.Cog.listener()

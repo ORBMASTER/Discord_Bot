@@ -5,6 +5,9 @@ import os
 from nextcord.utils import get
 import logging
 import time
+from nextcord import Interaction
+import nextcord
+
 
 
 import requests
@@ -14,6 +17,12 @@ class Music(commands.Cog):
     def __init__(self, client):
         self.client = client
         self.queues = {}  # Use `self.queues` to store queues
+    testServerId=1223345494353248317
+
+    @nextcord.slash_command(name="musictesting",description="introduction to slash commands",guild_ids=[testServerId])
+    async def musictesting(self,interaction:Interaction):
+        await interaction.response.send_message("MUSIC")
+
 
     def check_queue(self, ctx, guild_id):
         # Check if the queue is not empty
