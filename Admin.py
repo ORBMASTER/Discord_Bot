@@ -2,10 +2,19 @@
 from nextcord.ext import commands
 from nextcord.ext.commands import has_permissions, MissingPermissions
 import nextcord
+from nextcord import Interaction
 
+testServerId=1223345494353248317
 class Admin(commands.Cog):
     def __init__(self, client):
         self.client = client
+    testServerId=1223345494353248317
+    @nextcord.slash_command(name="admintesting",description="introduction to slash commands",guild_ids=[testServerId])
+    async def admintesting(self,interaction:Interaction):
+        await interaction.response.send_message("admin")
+
+        
+
 
     @commands.command(pass_context=True)
     @commands.has_permissions(manage_roles=True)
